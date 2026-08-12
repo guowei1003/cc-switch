@@ -98,6 +98,8 @@ import ToolsPanel from "@/components/openclaw/ToolsPanel";
 import AgentsDefaultsPanel from "@/components/openclaw/AgentsDefaultsPanel";
 import OpenClawHealthBanner from "@/components/openclaw/OpenClawHealthBanner";
 import HermesMemoryPanel from "@/components/hermes/HermesMemoryPanel";
+import { LoginPage } from "@/components/auth/LoginPage";
+import { useAuth } from "@/contexts/AuthContext";
 
 type View =
   | "providers"
@@ -173,6 +175,7 @@ const getInitialView = (): View => {
 function App() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
 
   const [activeApp, setActiveApp] = useState<AppId>(getInitialApp);
   const sharedFeatureApp: AppId =
@@ -1019,10 +1022,17 @@ function App() {
                       activeProviderId={activeProviderId}
                       onSwitch={switchProvider}
                       onStopUsing={
-                        activeApp === "gemini" || activeApp === "claude" || activeApp === "codex" || activeApp === "grokbuild" || activeApp === "claude-desktop"
-                          ? () => (isProxyRunning && isCurrentAppTakeoverActive)
-                            ? providersApi.clearCurrentWithTakeover(activeApp)
-                            : providersApi.clearCurrent(activeApp)
+                        activeApp === "gemini" ||
+                        activeApp === "claude" ||
+                        activeApp === "codex" ||
+                        activeApp === "grokbuild" ||
+                        activeApp === "claude-desktop"
+                          ? () =>
+                              isProxyRunning && isCurrentAppTakeoverActive
+                                ? providersApi.clearCurrentWithTakeover(
+                                    activeApp,
+                                  )
+                                : providersApi.clearCurrent(activeApp)
                           : undefined
                       }
                       onEdit={(provider) => {
@@ -1085,6 +1095,10 @@ function App() {
       </AnimatePresence>
     );
   };
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
 
   return (
     <div

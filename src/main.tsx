@@ -10,6 +10,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 import { queryClient } from "@/lib/query";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "./contexts/AuthContext";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import { message } from "@tauri-apps/plugin-dialog";
@@ -123,8 +124,10 @@ async function bootstrap() {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="system" storageKey="cc-switch-theme">
             <UpdateProvider>
-              <App />
-              <Toaster />
+              <AuthProvider>
+                <App />
+                <Toaster />
+              </AuthProvider>
             </UpdateProvider>
           </ThemeProvider>
         </QueryClientProvider>
